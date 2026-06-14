@@ -4,7 +4,7 @@
 
 **Goal:** Scaffold a reusable NestJS microservices monorepo with gateway, user-service, product-service, and notification-service wired via TCP, backed by PostgreSQL, with Swagger docs and JWT auth.
 
-**Architecture:** pnpm workspaces with a shared `@app/contracts` package for DTOs and message patterns. Gateway owns HTTP + JWT validation and proxies to services via TCP ClientProxy. Services expose `@MessagePattern` / `@EventPattern` handlers with no HTTP layer.
+**Architecture:** pnpm workspaces with a shared `@app/contracts` lib for DTOs, message patterns, DB helpers, schemas, and env validation. Lives at `lib/` (workspace root). Gateway owns HTTP + JWT validation and proxies to services via TCP ClientProxy. Services expose `@MessagePattern` / `@EventPattern` handlers with no HTTP layer.
 
 **Tech Stack:** NestJS 10, pnpm workspaces, Prisma 5, PostgreSQL 16 (Docker), passport-jwt, @nestjs/swagger, class-validator, bcryptjs, concurrently
 
@@ -23,18 +23,36 @@ nest-micro-starter/
 ├── .env.example
 ├── docker-compose.yml
 ├── docker/init.sql
-├── packages/
-│   └── contracts/
-│       ├── package.json
-│       ├── tsconfig.json
-│       └── src/
-│           ├── index.ts
-│           ├── patterns.ts
-│           └── dto/
-│               ├── auth.dto.ts
-│               ├── user.dto.ts
-│               ├── product.dto.ts
-│               └── notification.dto.ts
+├── lib/                                  # @app/contracts — shared library
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── src/
+│       ├── index.ts
+│       ├── constants/
+│       │   ├── patterns.ts
+│       │   └── index.ts
+│       ├── dto/
+│       │   ├── auth.dto.ts
+│       │   ├── user.dto.ts
+│       │   ├── product.dto.ts
+│       │   ├── notification.dto.ts
+│       │   └── index.ts
+│       ├── dto-response/
+│       │   ├── user.response.ts
+│       │   ├── product.response.ts
+│       │   └── index.ts
+│       ├── db/
+│       │   ├── prisma.service.ts
+│       │   ├── prisma.module.ts
+│       │   └── index.ts
+│       ├── schema/
+│       │   ├── user.schema.ts
+│       │   ├── product.schema.ts
+│       │   ├── notification.schema.ts
+│       │   └── index.ts
+│       └── env/
+│           ├── env.validation.ts
+│           └── index.ts
 ├── apps/
 │   ├── gateway/
 │   │   ├── package.json
@@ -242,16 +260,16 @@ git commit -m "chore: root monorepo scaffolding"
 ## Task 2: Contracts package
 
 **Files:**
-- Create: `packages/contracts/package.json`
-- Create: `packages/contracts/tsconfig.json`
-- Create: `packages/contracts/src/patterns.ts`
-- Create: `packages/contracts/src/dto/auth.dto.ts`
-- Create: `packages/contracts/src/dto/user.dto.ts`
-- Create: `packages/contracts/src/dto/product.dto.ts`
-- Create: `packages/contracts/src/dto/notification.dto.ts`
-- Create: `packages/contracts/src/index.ts`
+- Create: `lib/package.json`
+- Create: `lib/tsconfig.json`
+- Create: `lib/src/patterns.ts`
+- Create: `lib/src/dto/auth.dto.ts`
+- Create: `lib/src/dto/user.dto.ts`
+- Create: `lib/src/dto/product.dto.ts`
+- Create: `lib/src/dto/notification.dto.ts`
+- Create: `lib/src/index.ts`
 
-- [ ] **Step 1: Create `packages/contracts/package.json`**
+- [ ] **Step 1: Create `lib/package.json`**
 
 ```json
 {
@@ -272,7 +290,7 @@ git commit -m "chore: root monorepo scaffolding"
 }
 ```
 
-- [ ] **Step 2: Create `packages/contracts/tsconfig.json`**
+- [ ] **Step 2: Create `lib/tsconfig.json`**
 
 ```json
 {
@@ -285,7 +303,7 @@ git commit -m "chore: root monorepo scaffolding"
 }
 ```
 
-- [ ] **Step 3: Create `packages/contracts/src/patterns.ts`**
+- [ ] **Step 3: Create `lib/src/patterns.ts`**
 
 ```typescript
 export const USER_PATTERNS = {
@@ -311,7 +329,7 @@ export const NOTIFICATION_PATTERNS = {
 } as const;
 ```
 
-- [ ] **Step 4: Create `packages/contracts/src/dto/auth.dto.ts`**
+- [ ] **Step 4: Create `lib/src/dto/auth.dto.ts`**
 
 ```typescript
 import { ApiProperty } from '@nestjs/swagger';
@@ -329,7 +347,7 @@ export class LoginDto {
 }
 ```
 
-- [ ] **Step 5: Create `packages/contracts/src/dto/user.dto.ts`**
+- [ ] **Step 5: Create `lib/src/dto/user.dto.ts`**
 
 ```typescript
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
@@ -361,7 +379,7 @@ export class UserResponse {
 }
 ```
 
-- [ ] **Step 6: Create `packages/contracts/src/dto/product.dto.ts`**
+- [ ] **Step 6: Create `lib/src/dto/product.dto.ts`**
 
 ```typescript
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
@@ -396,7 +414,7 @@ export class ProductResponse {
 }
 ```
 
-- [ ] **Step 7: Create `packages/contracts/src/dto/notification.dto.ts`**
+- [ ] **Step 7: Create `lib/src/dto/notification.dto.ts`**
 
 ```typescript
 import { ApiProperty } from '@nestjs/swagger';
@@ -417,7 +435,7 @@ export class SendNotificationDto {
 }
 ```
 
-- [ ] **Step 8: Create `packages/contracts/src/index.ts`**
+- [ ] **Step 8: Create `lib/src/index.ts`**
 
 ```typescript
 export * from './patterns';
@@ -576,7 +594,7 @@ git commit -m "chore: add docker-compose and DB init script"
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^@app/contracts(|/.*)$": "<rootDir>/../../packages/contracts/src$1"
+      "^@app/contracts(|/.*)$": "<rootDir>/../../lib/src$1"
     }
   }
 }
@@ -589,8 +607,8 @@ git commit -m "chore: add docker-compose and DB init script"
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@app/contracts": ["../../packages/contracts/src"],
-      "@app/contracts/*": ["../../packages/contracts/src/*"]
+      "@app/contracts": ["../../lib/src"],
+      "@app/contracts/*": ["../../lib/src/*"]
     }
   },
   "include": ["src/**/*"],
@@ -991,7 +1009,7 @@ git commit -m "feat(user-service): add message handlers and unit tests"
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^@app/contracts(|/.*)$": "<rootDir>/../../packages/contracts/src$1"
+      "^@app/contracts(|/.*)$": "<rootDir>/../../lib/src$1"
     }
   }
 }
@@ -1004,8 +1022,8 @@ git commit -m "feat(user-service): add message handlers and unit tests"
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@app/contracts": ["../../packages/contracts/src"],
-      "@app/contracts/*": ["../../packages/contracts/src/*"]
+      "@app/contracts": ["../../lib/src"],
+      "@app/contracts/*": ["../../lib/src/*"]
     }
   },
   "include": ["src/**/*"],
@@ -1332,8 +1350,8 @@ git commit -m "feat(product-service): add microservice with CRUD and tests"
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@app/contracts": ["../../packages/contracts/src"],
-      "@app/contracts/*": ["../../packages/contracts/src/*"]
+      "@app/contracts": ["../../lib/src"],
+      "@app/contracts/*": ["../../lib/src/*"]
     }
   },
   "include": ["src/**/*"],
@@ -1565,7 +1583,7 @@ git commit -m "feat(notification-service): add fire-and-forget event handler"
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^@app/contracts(|/.*)$": "<rootDir>/../../packages/contracts/src$1"
+      "^@app/contracts(|/.*)$": "<rootDir>/../../lib/src$1"
     }
   }
 }
@@ -1578,8 +1596,8 @@ git commit -m "feat(notification-service): add fire-and-forget event handler"
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@app/contracts": ["../../packages/contracts/src"],
-      "@app/contracts/*": ["../../packages/contracts/src/*"]
+      "@app/contracts": ["../../lib/src"],
+      "@app/contracts/*": ["../../lib/src/*"]
     }
   },
   "include": ["src/**/*"],
@@ -2349,7 +2367,7 @@ Client → Gateway (HTTP:3000)
 
 - Gateway validates JWT on all routes except `POST /auth/login` and `POST /users`
 - Services communicate only via TCP — no HTTP server in services
-- `packages/contracts` holds all shared DTOs and message pattern constants
+- `lib` holds all shared DTOs and message pattern constants
 
 ## Project Structure
 
@@ -2372,7 +2390,7 @@ nest-micro-starter/
 1. Copy `apps/product-service/` → `apps/your-service/`
 2. Update `name`, `PORT`, `DATABASE_URL` in `package.json` and `.env`
 3. Write your Prisma schema + run `prisma:push` + `prisma:generate`
-4. Add message patterns to `packages/contracts/src/patterns.ts` + export from `index.ts`
+4. Add message patterns to `lib/src/patterns.ts` + export from `index.ts`
 5. Register TCP client in the relevant gateway module
 6. Add gateway controller + service + module
 
