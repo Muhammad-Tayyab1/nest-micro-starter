@@ -8,8 +8,8 @@
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",
-    "prisma:push": "pnpm --filter user-service run prisma:push && pnpm --filter product-service run prisma:push && pnpm --filter notification-service run prisma:push",
-    "prisma:generate": "pnpm --filter user-service run prisma:generate && pnpm --filter product-service run prisma:generate && pnpm --filter notification-service run prisma:generate"
+    "prisma:push": "pnpm --filter @app/contracts run prisma:push",
+    "prisma:generate": "pnpm --filter @app/contracts run prisma:generate"
   },
   "devDependencies": {
     "concurrently": "^10.0.3",

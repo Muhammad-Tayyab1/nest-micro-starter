@@ -3,14 +3,19 @@
   "version": "0.0.1",
   "main": "src/index.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prisma:push": "prisma db push",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
+    "@nestjs/common": "^11.1.26",
     "@nestjs/swagger": "^11.4.4",
+    "@prisma/client": "^7.8.0",
     "class-validator": "^0.15.1",
     "class-transformer": "^0.5.1"
   },
   "devDependencies": {
+    "prisma": "^7.8.0",
     "typescript": "^6.0.3"
   }
 }

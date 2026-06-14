@@ -91,15 +91,15 @@ docker ps
 
 ---
 
-## Step 5 — Push Prisma schemas
+## Step 5 — Push Prisma schema
 
 ```bash
 pnpm run prisma:push
 ```
 
-This runs `prisma db push` for all three services, creating the tables in each database.
+This runs `prisma db push` using the shared schema at `lib/prisma/schema.prisma`, creating all tables (`users`, `products`, `notifications`) in the database.
 
-Then regenerate the Prisma clients:
+Then regenerate the Prisma client:
 ```bash
 pnpm run prisma:generate
 ```

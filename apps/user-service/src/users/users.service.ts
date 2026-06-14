@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto, UpdateUserDto } from '@app/contracts';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@app/contracts';
 
 const USER_SELECT = {
   id: true,

@@ -42,7 +42,7 @@ pnpm run format            # Prettier across all apps
 
 ## Architecture
 
-This is a **NestJS 11 microservices monorepo** using **pnpm workspaces**, backed by a single **PostgreSQL** database (`starter_db`, local Docker), using **Prisma 7** as the ORM per service. Each service has its own Prisma schema and client but all connect to the same database.
+This is a **NestJS 11 microservices monorepo** using **pnpm workspaces**, backed by a single **PostgreSQL** database (`starter_db`, local Docker), using **Prisma 7** as the ORM via a shared schema in `lib/`.
 
 ### Apps
 
@@ -59,10 +59,12 @@ This is a **NestJS 11 microservices monorepo** using **pnpm workspaces**, backed
   - `lib/src/constants/patterns.ts` — TCP message pattern strings (`USER_PATTERNS`, `PRODUCT_PATTERNS`, `NOTIFICATION_PATTERNS`)
   - `lib/src/dto/` — request DTOs with class-validator + Swagger decorators
   - `lib/src/dto-response/` — response shape classes
+  - `lib/src/db/` — shared `PrismaModule` and `PrismaService`
+  - `lib/src/generated/prisma-client/` — generated Prisma client (committed, do not edit manually)
 
 Import anything shared as:
 ```typescript
-import { USER_PATTERNS, CreateUserDto } from '@app/contracts';
+import { USER_PATTERNS, CreateUserDto, PrismaModule, PrismaService } from '@app/contracts';
 ```
 
 ### Request lifecycle (gateway)
@@ -87,12 +89,14 @@ Public routes (no JWT): `POST /auth/login`
 
 ### Prisma 7 conventions
 
-Prisma 7 requires a `prisma.config.ts` at each service root alongside `schema.prisma`. Look at any existing service for the pattern — the schema.prisma does **not** include the `url` field in the datasource; that lives in `prisma.config.ts`.
+The Prisma schema lives at `lib/prisma/schema.prisma` — one shared schema for all services. The `prisma.config.ts` lives at `lib/prisma.config.ts`. The schema.prisma does **not** include the `url` field in the datasource; that lives in `prisma.config.ts`.
+
+`PrismaModule` and `PrismaService` are exported from `@app/contracts` — import them from there, never from a local `./prisma/` path.
 
 After schema changes:
-1. `pnpm --filter <service> run prisma:push`
-2. `pnpm --filter <service> run prisma:generate`
-3. Restart the service
+1. `pnpm run prisma:push` — runs from repo root, targets `@app/contracts`
+2. `pnpm run prisma:generate` — regenerates the client at `lib/src/generated/prisma-client/`
+3. Restart all services
 
 ### TypeScript path aliases
 
@@ -109,8 +113,8 @@ Each app's `tsconfig.json` maps `@app/contracts` to `../../lib/src`. The jest co
 
 1. Copy `apps/product-service/` — it is the canonical service template
 2. Update `name`, `PORT`, `DATABASE_URL` in `package.json` and `.env`
-3. Copy `prisma.config.ts` and write a new `prisma/schema.prisma`
-4. Run `prisma:push` + `prisma:generate`
+3. Add any new models to `lib/prisma/schema.prisma`, then run `pnpm run prisma:push` and `pnpm run prisma:generate` from the repo root
+4. Import `PrismaModule` from `@app/contracts` in the new service's `app.module.ts`
 5. Add message patterns to `lib/src/constants/patterns.ts` + export from `lib/src/index.ts`
 6. Register TCP client in the relevant gateway module (`ClientsModule.register`)
 7. Add gateway controller + service + module, import in `apps/gateway/src/app.module.ts`
