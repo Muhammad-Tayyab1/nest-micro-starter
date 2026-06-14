@@ -125,3 +125,44 @@ Each app's `tsconfig.json` maps `@app/contracts` to `../../lib/src`. The jest co
 - Add `@ApiTags`, `@ApiOperation`, `@ApiResponse` to all gateway controllers
 - Use `@ApiBearerAuth()` on protected routes/controllers
 - Swagger is only on the gateway — services have no HTTP layer
+
+---
+
+## Skills
+
+Skills are in `.claude/skills/`. Use the `Skill` tool to invoke them.
+
+| Skill | When to use |
+|-------|-------------|
+| `api-design` | Adding a new endpoint, service, or TCP message pattern |
+| `unit-test-generator` | Writing tests for services or controllers |
+| `security-audit` | Before any PR touching auth, guards, or sensitive data |
+| `pii` | Any code handling passwords, tokens, or personal data |
+| `adr-writer` | Documenting architectural decisions |
+| `business-doc-writer` | Before committing business logic changes |
+| `upgrade` | Auditing or upgrading dependencies |
+
+---
+
+## MCP Servers
+
+Configured in `.mcp.json`:
+
+| Server | Purpose |
+|--------|---------|
+| `context7` | Fetch current library/framework docs (NestJS, Prisma, etc.) |
+| `playwright` | Browser automation for API testing via Swagger UI |
+| `composio` | Third-party integrations |
+| `clickup` | Task management |
+
+---
+
+## Hooks
+
+`.claude/hooks/` contains auto-running hooks:
+
+| Hook | Trigger | Action |
+|------|---------|--------|
+| `post-edit-check.sh` | After file edits | Runs `pnpm lint` |
+| `test-guard.sh` | Before commit | Runs `pnpm test` |
+| `commit-guard.sh` | Before commit | Validates conventional commit format |
