@@ -42,7 +42,7 @@ pnpm run format            # Prettier across all apps
 
 ## Architecture
 
-This is a **NestJS 11 microservices monorepo** using **pnpm workspaces**, backed by **PostgreSQL** (local Docker), using **Prisma 7** as the ORM per service.
+This is a **NestJS 11 microservices monorepo** using **pnpm workspaces**, backed by a single **PostgreSQL** database (`starter_db`, local Docker), using **Prisma 7** as the ORM per service. Each service has its own Prisma schema and client but all connect to the same database.
 
 ### Apps
 

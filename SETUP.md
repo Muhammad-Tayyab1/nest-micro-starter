@@ -56,19 +56,19 @@ NOTIFICATION_SERVICE_PORT=3003
 ### User service (`apps/user-service/.env`)
 ```env
 PORT=3001
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/users_db
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/starter_db
 ```
 
 ### Product service (`apps/product-service/.env`)
 ```env
 PORT=3002
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/products_db
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/starter_db
 ```
 
 ### Notification service (`apps/notification-service/.env`)
 ```env
 PORT=3003
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/notifications_db
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/starter_db
 ```
 
 > `.env` files are git-ignored. Never commit them.
@@ -81,7 +81,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/notifications_db
 docker-compose up -d
 ```
 
-This starts a single PostgreSQL 16 container on port `5432`. On first run it automatically creates three databases: `users_db`, `products_db`, `notifications_db`.
+This starts a single PostgreSQL 16 container on port `5432`. On first run it automatically creates the `starter_db` database.
 
 Verify it's healthy:
 ```bash

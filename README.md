@@ -8,7 +8,7 @@ A production-ready NestJS microservices starter using pnpm workspaces and TCP tr
 |--|--|
 | **Framework** | NestJS 11 |
 | **Transport** | TCP (built-in, zero broker dependencies) |
-| **Database** | PostgreSQL 16 + Prisma 7 (one DB per service) |
+| **Database** | PostgreSQL 16 + Prisma 7 (single shared DB, isolated tables per service) |
 | **Auth** | JWT — validated at gateway, trusted by services |
 | **Docs** | Swagger UI at `/api/docs` |
 | **Workspace** | pnpm workspaces |
