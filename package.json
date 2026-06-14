@@ -1,0 +1,22 @@
+{
+  "name": "nest-micro-starter",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter gateway run start:dev\" \"pnpm --filter user-service run start:dev\" \"pnpm --filter product-service run start:dev\" \"pnpm --filter notification-service run start:dev\"",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "format": "pnpm -r run format",
+    "prisma:push": "pnpm --filter user-service run prisma:push && pnpm --filter product-service run prisma:push && pnpm --filter notification-service run prisma:push",
+    "prisma:generate": "pnpm --filter user-service run prisma:generate && pnpm --filter product-service run prisma:generate && pnpm --filter notification-service run prisma:generate"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "typescript": "^6.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.8.4"
+  }
+}
