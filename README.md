@@ -61,7 +61,7 @@ Client → Gateway (HTTP:3000, JWT validation)
 - **Gateway** owns JWT validation — services trust the gateway and never validate tokens themselves
 - **TCP only** — services have no HTTP server; all traffic goes through the gateway
 - **Shared contracts** in `lib/` — DTOs and message pattern constants imported by all apps as `@app/contracts`
-- **Notification pattern** uses `emit` (not `send`) — gateway fires and returns `{ queued: true }` immediately
+- **Notification pattern** uses `emit` (not `send`) — gateway fires and returns `{ sent: true }` immediately
 
 ## Project Structure
 
@@ -92,7 +92,7 @@ nest-micro-starter/
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | POST | `/auth/login` | — | Get JWT token |
-| POST | `/users` | — | Register a user |
+| POST | `/users` | JWT | Create user |
 | GET | `/users` | JWT | List users |
 | GET | `/users/:id` | JWT | Get user |
 | PATCH | `/users/:id` | JWT | Update user |

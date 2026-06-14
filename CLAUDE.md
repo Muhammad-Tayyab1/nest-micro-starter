@@ -59,9 +59,6 @@ This is a **NestJS 11 microservices monorepo** using **pnpm workspaces**, backed
   - `lib/src/constants/patterns.ts` — TCP message pattern strings (`USER_PATTERNS`, `PRODUCT_PATTERNS`, `NOTIFICATION_PATTERNS`)
   - `lib/src/dto/` — request DTOs with class-validator + Swagger decorators
   - `lib/src/dto-response/` — response shape classes
-  - `lib/src/db/` — shared `PrismaModule` + `PrismaService` (global, each service imports this)
-  - `lib/src/schema/` — TypeScript interfaces mirroring Prisma models
-  - `lib/src/env/` — environment validation helpers
 
 Import anything shared as:
 ```typescript
@@ -77,7 +74,7 @@ Every HTTP request passes through:
 3. `ResponseInterceptor` — wraps success: `{ success: true, statusCode, data }`
 4. `HttpExceptionFilter` — wraps errors: `{ success: false, statusCode, message, timestamp }`
 
-Public routes (no JWT): `POST /auth/login`, `POST /users`
+Public routes (no JWT): `POST /auth/login`
 
 ### Microservice communication
 

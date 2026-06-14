@@ -175,7 +175,7 @@ POST /notifications/send
   "body": "Hello from nest-micro-starter!"
 }
 ```
-Returns `{ "queued": true }` immediately (fire-and-forget).
+Returns `{ "sent": true }` immediately (fire-and-forget).
 
 ---
 
