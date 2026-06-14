@@ -28,6 +28,8 @@ export class UsersController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create user' })
   @ApiResponse({ status: 201 })
   create(@Body() dto: CreateUserDto) {
